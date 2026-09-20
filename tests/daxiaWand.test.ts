@@ -25,7 +25,9 @@ test('each random branch produces the corresponding finite, visible particle eff
       assert.ok(Array.from(particles.geometry.attributes[name].array).every(Number.isFinite))
     }
     assert.ok(Array.from(particles.geometry.attributes.alpha.array).some(a => a > .1))
-    assert.equal(particles.geometry.drawRange.count, i === 3 ? 720 : 240)
+    // fireworks blooms with the full buffer; maple thins its field to 60%,
+    // the other falling spells keep all 240
+    assert.equal(particles.geometry.drawRange.count, i === 3 ? 720 : i === 4 ? 144 : 240)
     effect.dispose()
   }
 })

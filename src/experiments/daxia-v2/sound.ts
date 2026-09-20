@@ -1,21 +1,30 @@
 import { solarState } from './environment'
 import type { Weather, Season } from './environment'
+import { COPY } from './i18n'
+import type { Lang } from './i18n'
 
+/* Levels are calibrated by measuring the real output, not by ear: the bed was
+ * previously ~-52 dBFS at best (-78 at night, i.e. inaudible — the old numbers
+ * were written for the brown-noise loop and never re-tuned when the source
+ * became quieter white noise). These land the room at roughly -42 dBFS on a
+ * clear day, -39 in rain, -48 in snow: present as a background, never a
+ * foreground. Re-measure with a probe tap before changing them.
+ */
 export function ambientProfile(weather: Weather, hour: number, season: Season) {
   const day = solarState(hour, season).aboveHorizon
   return {
-    bed: ({ sun: .003, cloud: .004, rain: .014, snow: .002 }[weather]) * (day ? 1 : .55),
+    bed: ({ sun: .045, cloud: .055, rain: .14, snow: .035 }[weather]) * (day ? 1 : .55),
     lowpass: weather === 'rain' ? 5200 : 2700,
     birds: day && weather === 'sun' && season !== 'winter',
-    cicadas: day && season === 'summer' && (weather === 'sun' || weather === 'cloud') ? (weather === 'sun' ? .10 : .065) : 0,
+    cicadas: day && season === 'summer' && (weather === 'sun' || weather === 'cloud') ? (weather === 'sun' ? .55 : .36) : 0,
   }
 }
-export function ambientDescription(weather: Weather, hour: number, season: Season) {
-  const profile = ambientProfile(weather, hour, season)
-  if (weather === 'rain') return '窗外轻雨'
-  if (weather === 'snow') return '静雪微声'
-  if (profile.cicadas) return profile.birds ? '轻柔鸟鸣 · 夏日蝉声' : '远处的夏蝉'
-  return profile.birds ? '疏疏鸟鸣' : '安静白噪音'
+export function ambientDescription(weather: Weather, hour: number, season: Season, lang: Lang = 'zh') {
+  const profile = ambientProfile(weather, hour, season), words = COPY[lang].sound.ambience
+  if (weather === 'rain') return words.rain
+  if (weather === 'snow') return words.snow
+  if (profile.cicadas) return profile.birds ? words.cicadasBirds : words.cicadas
+  return profile.birds ? words.birds : words.plain
 }
 
 export class RoomSound {
@@ -122,7 +131,7 @@ export class RoomSound {
     for (let i = 0; i < 2; i++) {
       const o = ctx.createOscillator(), g = ctx.createGain(), start = ctx.currentTime + .3 + i * .26
       o.type = 'sine'; o.frequency.setValueAtTime(2200 + i * 170, start); o.frequency.exponentialRampToValueAtTime(3100, start + .055); o.frequency.exponentialRampToValueAtTime(2500, start + .16)
-      g.gain.setValueAtTime(.00001, start); g.gain.exponentialRampToValueAtTime(.018, start + .026); g.gain.exponentialRampToValueAtTime(.00001, start + .21)
+      g.gain.setValueAtTime(.00001, start); g.gain.exponentialRampToValueAtTime(.05, start + .026); g.gain.exponentialRampToValueAtTime(.00001, start + .21)
       o.connect(g); g.connect(this.master); o.start(start); o.stop(start + .23); o.onended = () => { o.disconnect(); g.disconnect() }
     }
   }

@@ -13,14 +13,16 @@ export type { Weather } from './environment'
 
 export type View = 'overview' | 'desk' | 'window' | 'qin'
 export type Settings = { season: Season; weather: Weather; hour: number; lamp: boolean; magic: boolean; rotating: boolean; reduced: boolean }
-export type SceneAPI = { toggleCat: () => void; toggleWand: () => void; pluck: () => void; update: (settings: Settings) => void; view: (view: View) => void; zoom: (direction: number) => void; screenshot: () => void; dispose: () => void }
+export type SceneAPI = { toggleCat: () => void; toggleWand: () => void; pluck: () => void; update: (settings: Settings) => void; view: (view: View) => void; zoom: (direction: number) => void; screenshot: (name: string) => void; dispose: () => void }
 export function createScene(host: HTMLElement, initial: Settings, onAction: (action: string) => void, onReady: () => void): SceneAPI {
   let settings = { ...initial, weather: weatherForSeason(initial.weather, initial.season) }, alive = true, frame = 0, elapsed = 0
   const scene = new T.Scene(), camera = new T.PerspectiveCamera(35, 1, .1, 80)
   const renderer = new T.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.65)); renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFShadowMap
   renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.25; renderer.setClearColor('#edece5', 0)
-  renderer.domElement.setAttribute('aria-label', '三维花园书房：拖动旋转，滚轮缩放，右键拖动平移。点击魔杖可随机施法，再次点击使其归位；点击小黑猫唤醒，移动鼠标让它追视，再点击地面让它走过去。'); renderer.domElement.tabIndex = 0; host.appendChild(renderer.domElement)
+  // No aria-label here: the label is user-facing copy, so App sets it from the
+  // active language (and re-sets it when the visitor switches).
+  renderer.domElement.tabIndex = 0; host.appendChild(renderer.domElement)
   const orbit = createRoomOrbit(camera, renderer.domElement), { controls } = orbit
   controls.enableDamping = !settings.reduced
   const room = buildRoom(); scene.add(room.group)
@@ -202,7 +204,7 @@ export function createScene(host: HTMLElement, initial: Settings, onAction: (act
     pluck, toggleWand, toggleCat,
     update(next) { settings = { ...next, weather: weatherForSeason(next.weather, next.season) }; controls.enableDamping = !settings.reduced; if (!settings.magic && wandMagic.active) { wandMagic.land(); onAction('wand:rest') } }, view,
     zoom(direction) { transition = null; const offset = camera.position.clone().sub(controls.target), distance = T.MathUtils.clamp(offset.length() * (direction > 0 ? .82 : 1.22), controls.minDistance, controls.maxDistance); camera.position.copy(controls.target).add(offset.setLength(distance)); controls.update() },
-    screenshot() { renderer.render(scene, camera); const output = document.createElement('canvas'); output.width = renderer.domElement.width; output.height = renderer.domElement.height; const context = output.getContext('2d')!; context.fillStyle = shell?.style.getPropertyValue('--scene-center') || '#edece5'; context.fillRect(0, 0, output.width, output.height); context.drawImage(renderer.domElement, 0, 0); const link = document.createElement('a'); link.download = `花与书之间-${settings.season}-${settings.weather}-${settings.hour}时.png`; link.href = output.toDataURL('image/png'); link.click() },
+    screenshot(name) { renderer.render(scene, camera); const output = document.createElement('canvas'); output.width = renderer.domElement.width; output.height = renderer.domElement.height; const context = output.getContext('2d')!; context.fillStyle = shell?.style.getPropertyValue('--scene-center') || '#edece5'; context.fillRect(0, 0, output.width, output.height); context.drawImage(renderer.domElement, 0, 0); const link = document.createElement('a'); link.download = `${name}.png`; link.href = output.toDataURL('image/png'); link.click() },
     dispose() { alive = false; cancelAnimationFrame(frame); observer.disconnect(); controls.dispose(); renderer.domElement.removeEventListener('pointerdown', pointerDown); renderer.domElement.removeEventListener('pointerup', pointerUp); renderer.domElement.removeEventListener('pointermove', pointerMove); renderer.domElement.removeEventListener('pointercancel', cancel); renderer.domElement.removeEventListener('wheel', stopTransition); renderer.domElement.removeEventListener('webglcontextlost', contextLost); precipitation.forEach(p => p.dispose()); exterior.dispose(); magic.dispose(); lightMotes.dispose(); wandMagic.dispose(); cat.dispose(); scene.traverse(obj => { if (obj instanceof T.Mesh || obj instanceof T.Points) { obj.geometry.dispose(); if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose()); else obj.material.dispose() } }); room.dispose(); renderer.dispose(); renderer.domElement.remove() },
   }
 }

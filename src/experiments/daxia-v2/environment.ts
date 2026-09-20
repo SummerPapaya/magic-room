@@ -2,14 +2,15 @@
  * The shared panorama and directional light MUST use the same solar direction.
  * The full path stays in the front window hemisphere. The cutaway is not a light opening.
  * All seasons keep sunset on the central window axis; day length and altitude vary.
+ * Display names live in i18n.ts — this file holds only the numbers.
  */
 export type Weather = 'sun' | 'cloud' | 'rain' | 'snow'
 export type Season = 'spring' | 'summer' | 'autumn' | 'winter'
 export const SEASONS = {
-  spring: { name: '春', label: '春樱', description: '樱花绽开，新叶与花瓣一起迎风。', sunrise: 6, sunset: 18, altitude: 58 },
-  summer: { name: '夏', label: '夏荫', description: '绿荫繁盛，漫长的白昼慢慢落幕。', sunrise: 5, sunset: 19, altitude: 74 },
-  autumn: { name: '秋', label: '秋枫', description: '树梢染上金橙，落叶轻轻经过窗前。', sunrise: 6.25, sunset: 17.75, altitude: 48 },
-  winter: { name: '冬', label: '冬雪', description: '远山覆雪，疏枝等着下一次春天。', sunrise: 7.25, sunset: 16.75, altitude: 30 },
+  spring: { sunrise: 6, sunset: 18, altitude: 58 },
+  summer: { sunrise: 5, sunset: 19, altitude: 74 },
+  autumn: { sunrise: 6.25, sunset: 17.75, altitude: 48 },
+  winter: { sunrise: 7.25, sunset: 16.75, altitude: 30 },
 } as const
 export function smoothstep(a: number, b: number, x: number) {
   const t = Math.max(0, Math.min(1, (x - a) / (b - a)))
