@@ -113,7 +113,7 @@ export default function App() {
     <div className="interaction-hint chrome"><Move size={12}/><span>拖动旋转</span><i>·</i><span>滚轮缩放</span><i>·</i><span>右键平移</span><i>·</i><span>点击魔杖，收获一场惊喜</span></div>
     <dialog ref={dialog} className={`atelier-dialog ${modal === 'book' ? 'book-dialog' : ''}`} onCancel={() => setModal(null)} onClose={() => setModal(null)} onClick={e => { if (e.target === dialog.current) setModal(null) }} aria-label={modal === 'reference' ? '场景灵感原图' : '书页中的片刻'}>
       <button className="dialog-close icon-button" aria-label="关闭弹窗" onClick={() => setModal(null)}><X size={20}/></button>
-      {modal === 'reference' ? <><img src="/assets/rooms/daxia.jpg" alt="参考场景：拱形窗户、围绕房间的书柜、繁花与中央书桌"/><div className="reference-caption"><span>灵感的起点</span><p>保留拱窗与繁花，让复古木桌椅面向窗外。</p></div></> : <div className="reading-page"><BookOpen size={28} strokeWidth={1}/><span className="eyebrow">A LITTLE TIME FOR YOURSELF</span><h2>{pages[page][0]}</h2><p>{pages[page][1]}</p><button onClick={() => setPage(p => (p + 1) % pages.length)}>再读一页 <ChevronRight size={14}/></button><span className="page-number">— {String(page + 1).padStart(2, '0')} —</span></div>}
+      {modal === 'reference' ? <><img src="assets/rooms/daxia.jpg" alt="参考场景：拱形窗户、围绕房间的书柜、繁花与中央书桌"/><div className="reference-caption"><span>灵感的起点</span><p>保留拱窗与繁花，让复古木桌椅面向窗外。</p></div></> : <div className="reading-page"><BookOpen size={28} strokeWidth={1}/><span className="eyebrow">A LITTLE TIME FOR YOURSELF</span><h2>{pages[page][0]}</h2><p>{pages[page][1]}</p><button onClick={() => setPage(p => (p + 1) % pages.length)}>再读一页 <ChevronRight size={14}/></button><span className="page-number">— {String(page + 1).padStart(2, '0')} —</span></div>}
     </dialog>
   </main>
 }

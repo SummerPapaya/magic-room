@@ -39,7 +39,7 @@ export class RoomSound {
     this.context ??= new AudioContext()
     const ctx = this.context
     await ctx.resume()
-    this.meowBuffer ??= fetch('/assets/audio/daxia-v2/cat-soft-meow.wav').then(response => {
+    this.meowBuffer ??= fetch('assets/audio/daxia-v2/cat-soft-meow.wav').then(response => {
       if (!response.ok) throw new Error('Cat recording could not be loaded')
       return response.arrayBuffer()
     }).then(data => ctx.decodeAudioData(data)).catch(error => { this.meowBuffer = null; throw error })
