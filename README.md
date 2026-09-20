@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/readme/magic-room-hero.gif" width="100%" alt="Summer's Magic Room: a three-window reading room with seasonal light, a hovering book, wand, and cat">
+  <img src="./assets/readme/magic-room-seasonal-hero.gif" width="100%" alt="Summer's Magic Room: a warm reading room with one arch window, crystal ball, books, flowers, and a wand that releases small spells">
 </p>
 
 # Summer's Magic Room
