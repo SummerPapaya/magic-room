@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <title>Summer's Magic Room · README Preview</title>
+    <style>
+      :root { color: #24292f; background: #f6f8fa; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 48px 20px 72px; }
+      main { width: min(980px, 100%); margin: 0 auto; padding: clamp(24px, 6vw, 56px); background: #fff; border: 1px solid #d0d7de; border-radius: 12px; box-shadow: 0 18px 60px rgba(31, 35, 40, .08); }
+      .eyebrow { margin: 0 0 18px; color: #57606a; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+      .hero { display: block; width: 100%; border-radius: 9px; border: 1px solid #d8dee4; }
+      h1 { margin: 34px 0 6px; font-family: Georgia, "Songti SC", serif; font-size: clamp(34px, 6vw, 52px); letter-spacing: -.03em; }
+      h2 { margin: 46px 0 16px; padding-bottom: 10px; border-bottom: 1px solid #d8dee4; font-size: 24px; }
+      h3 { margin: 0; font-size: 18px; color: #57606a; font-weight: 500; }
+      p, li, td { font-size: 16px; line-height: 1.72; }
+      .intro { color: #3f4851; font-size: 18px; }
+      .english { color: #57606a; font-family: Georgia, "Songti SC", serif; }
+      blockquote { margin: 28px 0; padding: 14px 22px; border-left: 4px solid #9ea7dd; color: #3d416f; background: #f6f7fb; }
+      blockquote p { margin: 0; } blockquote p + p { margin-top: 9px; }
+      code { padding: .15em .35em; border-radius: 5px; background: #f6f8fa; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
+      pre { padding: 16px; overflow: auto; border-radius: 8px; background: #24292f; color: #f6f8fa; } pre code { padding: 0; background: transparent; color: inherit; }
+      table { width: 100%; border-collapse: collapse; overflow: hidden; border: 1px solid #d8dee4; border-radius: 8px; } th, td { padding: 13px 16px; border: 1px solid #d8dee4; vertical-align: top; text-align: left; } th { background: #f6f8fa; }
+      a { color: #0969da; text-decoration: none; } a:hover { text-decoration: underline; }
+      .note { color: #57606a; font-size: 13px; text-align: center; }
+      footer { margin-top: 42px; color: #57606a; font-family: Georgia, "Songti SC", serif; text-align: center; }
+      @media (max-width: 700px) { body { padding: 0; } main { border: 0; border-radius: 0; box-shadow: none; } table { display: block; overflow-x: auto; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">README Preview · GitHub-style rendering</p>
+      <img class="hero" src="./assets/readme/magic-room-hero.gif" alt="Summer's Magic Room: a three-window reading room with seasonal light, a hovering book, wand, and cat" />
+      <h1>Summer's Magic Room</h1>
+      <h3>Summer, aka Shiami the Witch · 大夏的魔法书屋</h3>
+      <p class="intro">一个可以自由漫游的三渲二魔法书房。三扇拱窗会随晴雨、昼夜与四季改变光线；魔杖、古琴、小黑猫与漂浮的微光让每一次探访都留下一点回应。</p>
+      <p class="english"><em>A stylized, explorable Three.js reading room. Its three arched windows respond to weather, time, and season; a wand, guqin, black cat, and floating motes answer each visit in small ways.</em></p>
+      <blockquote><p>If you are a woman and dare to look within yourself, you are a Witch. ——W.I.T.C.H New York, 1968</p><p>如果您是女性 并敢于自我观照， 那您就是女巫。 ——WITCH宣言 纽约，1968</p></blockquote>
+      <p class="note">GitHub displays the motion as a GIF. The editable SVG source and motion specification live in <code>assets/readme/</code>.</p>
+
+      <h2>Enter the room · 进入小屋</h2>
+      <pre><code>npm install
+npm run dev</code></pre>
+      <p>Open <a href="./daxia-v2.html"><code>/daxia-v2.html</code></a> in the local Vite server. Drag to orbit around the room, scroll to zoom, and use the weather, time, season, ambience, wand, and cat interactions in the interface.</p>
+      <p>在本地 Vite 服务中打开 <a href="./daxia-v2.html"><code>/daxia-v2.html</code></a>。拖拽可环绕观看，滚轮可缩放；界面内可选择天气、时刻与四季，并与环境音、魔杖和小猫互动。</p>
+
+      <h2>What the room responds to · 小屋会回应什么</h2>
+      <table><thead><tr><th>Interaction</th><th>Response</th></tr></thead><tbody>
+        <tr><td>Time and weather · 时刻与天气</td><td>A single sun follows a coherent path across the three front windows; sunset warms to orange-red, while clouds, rain, and snow soften the daylight. · 唯一的太阳沿前方三窗移动；晴天日落转为橙红，阴雨与雪天的自然光更柔和。</td></tr>
+        <tr><td>Four seasons · 春夏秋冬</td><td>Exterior planting, falling material, sky color, and ambience shift from spring bloom to summer green, autumn maple, and winter snow. · 窗外植被、飘落物、天空与环境音会随四季改变。</td></tr>
+        <tr><td>Magic wand · 魔杖</td><td>Click to lift the wand and trigger gold motes, pale-pink petals, snow, maple leaves, or a soft star-firework. · 点击让魔杖升起并随机触发流金、樱吹雪、飞雪、枫叶或星空烟花。</td></tr>
+        <tr><td>Black cat · 小黑猫</td><td>The cat sleeps until awakened, meows when selected, watches the pointer, and walks toward a later click. · 小猫平时安睡；点击后会喵叫、注视鼠标，并向之后点击的位置自然走去。</td></tr>
+      </tbody></table>
+
+      <h2>Built for a small, tactile world · 为可触摸的小世界而作</h2>
+      <ul><li><strong>Three.js + React</strong> create the navigable diorama and its stylized lighting.</li><li><strong>Vite + TypeScript</strong> keep the room quick to run and straightforward to extend.</li><li>Season, weather, time, and sound controllers make the room a stateful scene instead of a fixed illustration.</li><li><strong>No account, server, database, or API key is required.</strong></li></ul>
+
+      <h2>Project map · 项目结构</h2>
+      <pre><code>src/experiments/daxia-v2/  # Room scene, interactions, light, cat, sound, and UI
+public/assets/             # Reference image and local cat audio
+assets/readme/             # README artwork: static SVG, animated SVG, GIF, and motion spec
+tests/                     # Room behavior tests
+daxia-v2.html             # Standalone room entry point</code></pre>
+
+      <h2>Verify · 验证</h2>
+      <pre><code>npm run build
+npm test</code></pre>
+      <p>The build output is written to <code>dist/</code>, which is intentionally excluded from version control.</p>
+      <p>构建产物位于 <code>dist/</code>，该目录不会提交到版本库。</p>
+
+      <h2>Privacy · 隐私</h2>
+      <p>This standalone room does not collect visitor data and includes no credentials, API keys, local paths, or chat history. Keep future secrets outside the repository if you add deployment services later.</p>
+      <p>本独立小屋不收集访客数据，仓库中不包含密码、API key、本地路径或聊天记录。若未来接入部署服务，请将密钥保存在平台环境变量中。</p>
+
+      <h2>Credits · 鸣谢</h2>
+      <p>The cat meow sound is <a href="https://freesound.org/s/526092/">“Cat Meow 2” by Freesound user dnlburnett</a>, released under <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+
+      <h2>License recommendation · License 建议</h2>
+      <ol><li><strong>MIT License</strong> for source code, configuration, and documentation.</li><li><strong>CC BY-NC-SA 4.0</strong> for original visual, audio, and narrative assets.</li></ol>
+      <p>Third-party files keep their original licenses. This is a recommendation, not a license grant: add the two license texts only after confirming ownership or permission for every included asset.</p>
+      <footer>Made as a room to linger in — 一间可以停留片刻的书房。</footer>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="430" viewBox="0 0 1200 430" role="img" aria-labelledby="title desc">
+  <title id="title">Summer's Magic Room animated illustration source</title>
+  <desc id="desc">A GitHub-editable SVG animation layer for the Magic Room hero.</desc>
+  <style>
+    @keyframes float-book { 0%,100% { transform: translateY(0); } 22%,70% { transform: translateY(-16px); } }
+    @keyframes shine { 0%,100% { opacity: .12; } 24%,66% { opacity: .72; } }
+    @keyframes mote { 0%,100% { opacity: 0; transform: translateY(8px); } 22%,72% { opacity: 1; transform: translateY(-14px); } }
+    #book-glow { animation: float-book 5s ease-in-out infinite; transform-origin: 583px 188px; }
+    #wand-glow { animation: shine 5s ease-in-out infinite; }
+    .mote { animation: mote 5s ease-in-out infinite; }
+    .mote:nth-child(2) { animation-delay: .35s; } .mote:nth-child(3) { animation-delay: .6s; }
+  </style>
+  <image href="magic-room-hero.svg" width="1200" height="430"/>
+  <g id="book-glow" fill="none" stroke="#fff6c8" stroke-width="3" opacity=".75"><path d="M548 189 583 168l35 21-35 18Z"/><circle cx="583" cy="188" r="42" opacity=".28"/></g>
+  <g id="wand-glow" fill="#fff1bc"><circle cx="754" cy="270" r="15" opacity=".2"/><circle cx="754" cy="270" r="4"/></g>
+  <g fill="#fff2c4"><circle class="mote" cx="542" cy="142" r="3"/><circle class="mote" cx="624" cy="138" r="2.5"/><circle class="mote" cx="687" cy="168" r="2"/></g>
+</svg>

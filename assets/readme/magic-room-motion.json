@@ -1,0 +1,13 @@
+{
+  "width": 1200,
+  "fps": 30,
+  "duration": 5,
+  "colors": 256,
+  "dither": "none",
+  "clip_to_base_alpha": true,
+  "max_size_mb": 2,
+  "layers": [
+    { "id": "book", "enter": { "start": 0.25, "end": 1.15, "from": [0, 18] }, "exit": { "start": 4.1, "end": 4.95, "to": [0, 18] } },
+    { "id": "wand", "enter": { "start": 0.42, "end": 1.25, "from": [0, 20] }, "exit": { "start": 4.1, "end": 4.95, "to": [0, 20] } }
+  ]
+}
