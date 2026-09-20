@@ -18,7 +18,7 @@ const CHINESE_COUNTRIES = ['CN']
 const zh = {
   htmlLang: 'zh-CN',
   title: 'Summer\'s Magic Room · 大夏的魔法书屋',
-  canvasAria: '三维花园书房：拖动旋转，滚轮缩放，右键拖动平移。点击魔杖可随机施法，再次点击使其归位；点击小黑猫唤醒，移动鼠标让它追视，再点击地面让它走过去。',
+  canvasAria: '三维花园书房：拖动旋转，滚轮缩放，右键拖动平移。点击魔杖可随机施法，再次点击使其归位；点击小黑猫唤醒，移动鼠标逗逗它，再点击地面让它走过去。',
   loading: '让光，慢慢进来',
   errorWebgl: '这间书房需要 WebGL 支持，请使用开启硬件加速的浏览器。',
   errorLost: '画面暂时失去了连接，请重新打开这间书房。',
@@ -78,10 +78,10 @@ const zh = {
   sceneNote: '一卷书 · 一张琴 · 一室微光',
   cat: {
     wake: '唤醒小猫', rest: '让小猫休息',
-    title: '点击小猫唤醒，移动鼠标让它追视，再点击地面让它走过去 (C)',
+    title: '点击小猫唤醒，移动鼠标逗逗它，再点击地面让它走过去 (C)',
     napping: '小猫在打盹', walking: '小猫散步中', watching: '小猫看向你',
     nappingNote: '轻轻唤醒它', awakeNote: '点击地面，陪它走走',
-    wokeNote: '小猫醒啦。移动鼠标让它追视，点击地面让它走过去。',
+    wokeNote: '小猫醒啦。移动鼠标逗逗它，点击地面让它走过去。',
   },
   tools: {
     zoomIn: '放大场景', zoomOut: '缩小场景', reset: '重置视角',
