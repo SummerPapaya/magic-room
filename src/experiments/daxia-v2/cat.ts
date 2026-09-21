@@ -92,22 +92,42 @@ export function createCat(obstacles: T.Box2[], onState: (state: CatState) => voi
         if (!route.length) setState('sitting')
       }
       const breathe = reduced ? 0 : Math.sin(elapsed * 1.6) * .004 + Math.sin(gait * Math.PI * 4) * .006 * walk
-      // Sleek, low body — the walking cat reads as long and level rather than
-      // spherical. Less dramatic stretch along z, narrower across, and a hair
-      // shorter in height while standing.
-      body.position.set(0, T.MathUtils.lerp(.16, .31 + walk * .035, rise) + breathe, -.025 * walk)
-      body.scale.set(T.MathUtils.lerp(.3, .22 - walk * .012, rise), T.MathUtils.lerp(.15, .14 - walk * .02, rise), T.MathUtils.lerp(.23, .26 + walk * .06, rise))
-      // Chest sits lower, between the front legs; it pushes forward a touch
-      // when the cat is walking so the shoulders read clearly.
-      chest.position.set(0, T.MathUtils.lerp(.18, .42 - walk * .08, rise) + breathe, .05 + walk * .16)
-      chest.scale.set(.13, T.MathUtils.lerp(.12, .2 - walk * .06, rise), .13 + walk * .04)
-      // Head: forward, slightly low while walking, with a tiny vertical bob
-      // so the silhouette feels alive without bobbing the whole body.
-      head.position.set(.16 * (1 - rise), T.MathUtils.lerp(.19, .66 - walk * .14, rise) + breathe + walk * Math.sin(gait * Math.PI * 4) * .012, T.MathUtils.lerp(.14, .13 + walk * .28, rise))
+      // Three stages, smoothly blended: sleeping (loaf) → sitting (sphinx:
+      // body held upright by straight front legs, back legs folded alongside)
+      // → walking (horizontal stretch, long stride).
+      // For each value the formula is `lerp(sleep, lerp(sit, walk, walk), rise)`,
+      // so wake=0 lands on the sleeping shape and wake=1 walks between sit and
+      // walk as `walk` ramps in.
+      const S = (sit: number, walk: number) => T.MathUtils.lerp(sit, walk, walk)
+      body.position.set(0, T.MathUtils.lerp(.16, S(.22, .24 + walk * .105), rise) + breathe, -.025 * walk)
+      body.scale.set(
+        T.MathUtils.lerp(.3, S(.26, .24 - walk * .03), rise),
+        T.MathUtils.lerp(.15, S(.18, .12 + walk * .02), rise),
+        T.MathUtils.lerp(.23, S(.27, .34 - walk * .02), rise),
+      )
+      // Chest sits up between the front legs in sphinx pose, then stretches
+      // forward when the cat stands and walks.
+      chest.position.set(
+        0,
+        T.MathUtils.lerp(.18, S(.32, .34 + walk * .08), rise) + breathe,
+        T.MathUtils.lerp(.05, S(.06, .05 + walk * .16), rise),
+      )
+      chest.scale.set(
+        .13,
+        T.MathUtils.lerp(.12, S(.22, .2 - walk * .06), rise),
+        T.MathUtils.lerp(.13, S(.13, .13 + walk * .04), rise),
+      )
+      // Head: low and forward when sleeping; up and forward in sphinx pose;
+      // up with a tiny gait-bob when walking.
+      head.position.set(
+        T.MathUtils.lerp(.16, S(.13, 0), rise),
+        T.MathUtils.lerp(.19, S(.58, .66 - walk * .14), rise) + breathe + walk * Math.sin(gait * Math.PI * 4) * .012,
+        T.MathUtils.lerp(.14, S(.13, .13 + walk * .28), rise),
+      )
       const look = Math.atan2(gaze.x - group.position.x, gaze.z - group.position.z) - group.rotation.y
       const yaw = T.MathUtils.clamp(Math.atan2(Math.sin(look), Math.cos(look)), -.95, .95)
-      // While walking, the head still tracks the gaze but bobs subtly with the
-      // gait so the cat feels like it is glancing around as it strides.
+      // The sitting cat still tracks the cursor (calmly — the yaw target is
+      // undamped so it settles quickly); only the walking gait adds a bob.
       const walkYaw = yaw + Math.sin(gait * Math.PI * 2) * .07
       head.rotation.y = T.MathUtils.lerp(head.rotation.y, T.MathUtils.lerp(-.45, state === 'walking' ? walkYaw : yaw, rise), smoothing)
       // Chin tucks down a touch while walking; head otherwise sits upright.
@@ -127,15 +147,37 @@ export function createCat(obstacles: T.Box2[], onState: (state: CatState) => voi
         const phase = (gait + [0, .5, .5, 0][i]) % 1, swing = Math.max(0, (phase - .64) / .36)
         const step = reduced ? 0 : phase < .64 ? .145 - phase / .64 * .29 : -.145 + .29 * swing * swing * (3 - 2 * swing)
         const lift = reduced ? 0 : Math.sin(swing * Math.PI) * .06
+        // Walking (rise=1, walk=1): long stride, paws in front / behind body.
         const hipX = front ? .078 + walk * .012 : .13 - walk * .008
         const hipY = front ? .46 - walk * .045 : .27 + walk * .11
         const hipZ = front ? .105 + walk * .1 : -.07 - walk * .15
-        shoulder.set(side * T.MathUtils.lerp(.12, hipX, rise), T.MathUtils.lerp(.14, hipY, rise) + breathe, T.MathUtils.lerp(front ? .1 : -.11, hipZ, rise))
         const pawX = front ? .08 + walk * .012 : .145 - walk * .02
         const pawZ = front ? .175 + walk * .085 : -.14 - walk * .12
-        footTarget.set(side * T.MathUtils.lerp(.13, pawX, rise), .043 + lift * walk, T.MathUtils.lerp(front ? .15 : -.1, pawZ, rise) + step * walk)
-        const upper = front ? .225 - walk * .025 : .135 + walk * .035, lower = front ? .23 - walk * .015 : .14 + walk * .02
-        leg.pose(shoulder, footTarget, T.MathUtils.lerp(.09, upper, rise), T.MathUtils.lerp(.095, lower, rise), T.MathUtils.lerp(.035, .09, rise))
+        // Sitting (rise=1, walk=0): sphinx / Egyptian pose — front legs
+        // straight down from chest to floor in front of body, back legs
+        // folded forward at the knee so the paws come down beside the body.
+        const sitHipX = .085
+        const sitHipY = front ? .28 : .18
+        const sitHipZ = front ? .08 : -.08
+        const sitPawX = front ? .085 : .14
+        const sitPawZ = front ? .11 : -.02
+        const sitUpper = front ? .16 : .09
+        const sitLower = front ? .16 : .11
+        const sitKnee = front ? .04 : .07
+        shoulder.set(
+          side * T.MathUtils.lerp(.12, S(sitHipX, hipX), rise),
+          T.MathUtils.lerp(.14, S(sitHipY, hipY), rise) + breathe,
+          T.MathUtils.lerp(front ? .1 : -.11, S(sitHipZ, hipZ), rise),
+        )
+        footTarget.set(
+          side * T.MathUtils.lerp(.13, S(sitPawX, pawX), rise),
+          .043 + lift * walk,
+          T.MathUtils.lerp(front ? .15 : -.1, S(sitPawZ, pawZ), rise) + step * walk,
+        )
+        const upper = T.MathUtils.lerp(.09, S(sitUpper, front ? .225 - walk * .025 : .135 + walk * .035), rise)
+        const lower = T.MathUtils.lerp(.095, S(sitLower, front ? .23 - walk * .015 : .14 + walk * .02), rise)
+        const knee = T.MathUtils.lerp(.035, S(sitKnee, .09), rise)
+        leg.pose(shoulder, footTarget, upper, lower, knee)
       })
       tailMesh.morphTargetInfluences![0] = rise * (1 - walk)
       tailMesh.morphTargetInfluences![1] = rise * walk

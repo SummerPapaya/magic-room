@@ -177,11 +177,11 @@ function makeGuqin(parent: T.Group) {
   for (const z of [-.187, .187]) rod(table, [-w / 2, h + .073, z], [w / 2, h + .073, z], .004, '#dfd6b7')
   for (const x of [-.7, .71]) box(table, [x, h + .086, 0], [.07, .024, .27], '#79695b', .005)
   const instrument = at(roomCorner, [0, h + .106, 0]); instrument.name = 'seven-string-guqin'
-  // The narrow (tail) end of the guqin — the one facing the player — is lifted
-  // about 5° off the table, so the underside sits at a gentle angle instead of
-  // looking glued flat. Rotating around the instrument's local z-axis raises
-  // the -x (tail) end and lowers the +x (head) end by the same amount.
-  instrument.rotation.z = -5 * Math.PI / 180
+  // Lift the narrow (user-facing) end of the guqin off the table by a small,
+  // gentle angle — about 2.5°, half what was tried first. With the local +x
+  // axis pointing toward the narrow end, a positive rotation around z raises
+  // that end and lets the wider (head) end sit solidly on the table.
+  instrument.rotation.z = 2.5 * Math.PI / 180
   const body = new T.Shape()
   body.moveTo(-.96, -.155); body.quadraticCurveTo(-.99, 0, -.96, .155)
   body.bezierCurveTo(-.87, .17, -.68, .19, -.55, .17); body.bezierCurveTo(-.38, .125, -.24, .125, -.08, .14)
