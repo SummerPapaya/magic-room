@@ -45,11 +45,19 @@ export function createCat(obstacles: T.Box2[], onState: (state: CatState) => voi
   const shoulder = new T.Vector3(), footTarget = new T.Vector3()
   const tail = new T.Group(); group.add(tail)
   const tailCurve = new T.CatmullRomCurve3([[0, .16, -.2], [-.2, .1, -.29], [-.34, .065, -.07], [-.24, .06, .23], [.04, .06, .28], [.18, .075, .2]].map(p => new T.Vector3(...p)))
-  const uprightCurve = new T.CatmullRomCurve3([[0, .18, -.19], [-.17, .27, -.28], [-.36, .53, -.29], [-.38, .83, -.2], [-.3, .97, -.11], [-.23, .95, -.07]].map(p => new T.Vector3(...p)))
+  // Sitting: the tail drops from the rump and wraps around the left side of
+  // the body, tip resting beside the front paws — the classic settled-cat
+  // wrap. (An upright tail on a sitting cat reads as antennae on the head.)
+  const uprightCurve = new T.CatmullRomCurve3([[0, .26, -.22], [-.1, .14, -.3], [-.25, .07, -.22], [-.33, .055, -.02], [-.28, .05, .18], [-.16, .055, .26]].map(p => new T.Vector3(...p)))
   // Walking: the tail arches high over the back and curls gently forward,
   // echoing the reference pose where a confident black cat carries its tail
   // upright in a soft "?". The tip sits above the shoulders, slightly forward.
-  const walkingCurve = new T.CatmullRomCurve3([[0, .40, -.28], [-.01, .58, -.26], [-.03, .75, -.18], [-.05, .88, -.06], [-.03, .95, .06], [0, .93, .14]].map(p => new T.Vector3(...p)))
+  // Walking: the tail arches high over the back and curls gently forward,
+  // echoing the reference pose where a confident black cat carries its tail
+  // upright in a soft "?". The first two control points lie deep inside the
+  // rump so the tube emerges through the body surface — the root can never
+  // read as detached, even at glancing angles.
+  const walkingCurve = new T.CatmullRomCurve3([[0, .30, -.08], [0, .36, -.20], [0, .41, -.28], [-.01, .62, -.30], [-.04, .85, -.12], [-.02, .92, .12]].map(p => new T.Vector3(...p)))
   const tailGeometry = new T.TubeGeometry(tailCurve, 32, .036, 8, false), uprightGeometry = new T.TubeGeometry(uprightCurve, 32, .036, 8, false)
   const walkingGeometry = new T.TubeGeometry(walkingCurve, 32, .036, 8, false)
   tailGeometry.morphAttributes.position = [uprightGeometry.attributes.position.clone(), walkingGeometry.attributes.position.clone()]
