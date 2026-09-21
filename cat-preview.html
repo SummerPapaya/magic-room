@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><style>html,body{margin:0;background:#e6e1d4}canvas{display:block}</style></head>
+<body>
+<script type="module">
+import * as T from 'three'
+import { createCat } from '/src/experiments/daxia-v2/cat.ts'
+
+const params = new URLSearchParams(location.search)
+const VIEW = params.get('view') || 'profile' // profile | three-quarter
+
+const renderer = new T.WebGLRenderer({ antialias: true })
+renderer.setSize(innerWidth, innerHeight)
+renderer.setClearColor('#e6e1d4')
+renderer.shadowMap.enabled = true
+document.body.appendChild(renderer.domElement)
+
+const scene = new T.Scene()
+scene.add(new T.AmbientLight('#fff4e0', 1.4))
+const sun = new T.DirectionalLight('#ffffff', 2.0)
+sun.position.set(3, 5, 4); sun.castShadow = true; scene.add(sun)
+const ground = new T.Mesh(new T.PlaneGeometry(30, 30), new T.MeshToonMaterial({ color: '#c9c0ab' }))
+ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground)
+
+function makeCat(x, mode) {
+  const cat = createCat([], () => {})
+  cat.group.position.set(x, .045, 0)
+  cat.group.rotation.y = Math.PI / 2 // face +x so the z-camera sees a profile
+  scene.add(cat.group)
+  if (mode !== 'sleeping') {
+    cat.wake()
+    if (mode === 'walking') cat.moveTo(new T.Vector3(x + 1.2, 0, 0.0001))
+  }
+  return cat
+}
+
+const cats = [makeCat(-1.7, 'sleeping'), makeCat(-.1, 'sitting'), makeCat(1.5, 'walking')]
+
+// Drive the state machines synchronously: ~1.6s is enough for rise/walk to
+// settle while the walking cat is still mid-stride.
+for (let i = 0; i < 100; i++) cats.forEach(c => c.update(1 / 60, i / 60, false))
+
+const cam = new T.PerspectiveCamera(26, innerWidth / innerHeight, .1, 50)
+if (VIEW === 'three-quarter') { cam.position.set(3.4, 1.3, 4.6); cam.lookAt(.2, .28, 0) }
+else if (VIEW === 'walk') {
+  // Close-up on the walking cat, wherever it got to after the fixed updates.
+  const p = cats[2].group.position
+  cam.position.set(p.x, .45, p.z + 2.4); cam.lookAt(p.x, .32, p.z)
+}
+else if (VIEW === 'sit') {
+  const p = cats[1].group.position
+  cam.position.set(p.x, .45, p.z + 2.4); cam.lookAt(p.x, .28, p.z)
+}
+else { cam.position.set(.2, .5, 6.2); cam.lookAt(.2, .3, 0) }
+renderer.render(scene, cam)
+// Measurement dump: world-space key heights of the walking cat, so we can
+// verify the render matches the design numbers instead of eyeballing.
+const wc = cats[2], b = wc.group.getObjectByName('cat-body'), n = wc.group.getObjectByName('cat-neck')
+const pawWorld = new T.Vector3(); wc.group.getObjectByName('cat-paw').getWorldPosition(pawWorld)
+document.title = [
+  'state=' + wc.state,
+  'belly=' + (wc.group.position.y + b.position.y - b.scale.y).toFixed(3),
+  'back=' + (wc.group.position.y + b.position.y + b.scale.y).toFixed(3),
+  'bodyZ=' + b.scale.z.toFixed(3),
+  'pawY=' + pawWorld.y.toFixed(3),
+  'headY=' + (wc.group.position.y + wc.head.position.y).toFixed(3),
+  'neckY=' + n.position.y.toFixed(3),
+].join(' ')
+</script>
+</body>
+</html>

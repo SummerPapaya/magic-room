@@ -16,7 +16,11 @@ export function createCat(obstacles: T.Box2[], onState: (state: CatState) => voi
   }
   const body = ball(group, [0, .16, 0], [.3, .15, .23], fur)
   const chest = ball(group, [0, .2, .05], [.125, .23, .13], fur)
-  body.name = 'cat-body'; chest.name = 'cat-chest'
+  // The neck is the wedge that carries the head — without it the head reads
+  // as a ball floating next to the torso. It hides inside the body while the
+  // cat sleeps and stretches up-forward as the cat rises.
+  const neck = ball(group, [0, .2, .12], [.02, .02, .02], fur)
+  body.name = 'cat-body'; chest.name = 'cat-chest'; neck.name = 'cat-neck'
   const head = new T.Group(); head.scale.setScalar(.78); group.add(head)
   ball(head, [0, 0, 0], [.2, .175, .16], fur)
   for (const side of [-1, 1]) {
@@ -45,9 +49,9 @@ export function createCat(obstacles: T.Box2[], onState: (state: CatState) => voi
   // Walking: the tail arches high over the back and curls gently forward,
   // echoing the reference pose where a confident black cat carries its tail
   // upright in a soft "?". The tip sits above the shoulders, slightly forward.
-  const walkingCurve = new T.CatmullRomCurve3([[0, .28, -.22], [-.02, .5, -.18], [-.04, .72, -.08], [-.06, .88, .04], [-.04, .96, .14], [-.02, .94, .18]].map(p => new T.Vector3(...p)))
-  const tailGeometry = new T.TubeGeometry(tailCurve, 32, .031, 8, false), uprightGeometry = new T.TubeGeometry(uprightCurve, 32, .031, 8, false)
-  const walkingGeometry = new T.TubeGeometry(walkingCurve, 32, .031, 8, false)
+  const walkingCurve = new T.CatmullRomCurve3([[0, .40, -.28], [-.01, .58, -.26], [-.03, .75, -.18], [-.05, .88, -.06], [-.03, .95, .06], [0, .93, .14]].map(p => new T.Vector3(...p)))
+  const tailGeometry = new T.TubeGeometry(tailCurve, 32, .036, 8, false), uprightGeometry = new T.TubeGeometry(uprightCurve, 32, .036, 8, false)
+  const walkingGeometry = new T.TubeGeometry(walkingCurve, 32, .036, 8, false)
   tailGeometry.morphAttributes.position = [uprightGeometry.attributes.position.clone(), walkingGeometry.attributes.position.clone()]
   tailGeometry.morphAttributes.normal = [uprightGeometry.attributes.normal.clone(), walkingGeometry.attributes.normal.clone()]; uprightGeometry.dispose(); walkingGeometry.dispose()
   const tailMesh = new T.Mesh(tailGeometry, fur); tailMesh.name = 'cat-tail'; tailMesh.castShadow = true; tailMesh.frustumCulled = false; tail.add(tailMesh)
@@ -93,50 +97,60 @@ export function createCat(obstacles: T.Box2[], onState: (state: CatState) => voi
       }
       const breathe = reduced ? 0 : Math.sin(elapsed * 1.6) * .004 + Math.sin(gait * Math.PI * 4) * .006 * walk
       // Three stages, smoothly blended: sleeping (loaf) → sitting (sphinx:
-      // body held upright by straight front legs, back legs folded alongside)
-      // → walking (horizontal stretch, long stride).
-      // For each value the formula is `lerp(sleep, lerp(sit, walk, walk), rise)`,
-      // so wake=0 lands on the sleeping shape and wake=1 walks between sit and
-      // walk as `walk` ramps in.
-      const S = (sit: number, walk: number) => T.MathUtils.lerp(sit, walk, walk)
-      // Walking values were redesigned so the body sits low and stretches
-      // forward (horizontal silhouette, like a cat mid-stride) instead of the
-      // tall "stand at attention" pose we used to fall back to. Sitting values
-      // are unchanged — sphinx sits the same.
-      body.position.set(0, T.MathUtils.lerp(.16, S(.22, .26), rise) + breathe, -.025 * walk)
+      // haunches on the floor, chest lifted by straight front legs, back legs
+      // folded alongside) → walking (horizontal back, long straight legs,
+      // head carried high on a sloping neck — the classic silhouette).
+      // For each value the formula is `lerp(sleep, lerp(sit, walkTo, walk), rise)`.
+      // (The second parameter must NOT be named `walk` — it would shadow the
+      // outer blend factor and silently freeze every pose mid-blend.)
+      const S = (sit: number, walkTo: number) => T.MathUtils.lerp(sit, walkTo, walk)
+      // Body: in the sphinx sit the rear drops to the floor and the front
+      // pitches up; walking lifts the belly onto long legs, level and long.
+      body.position.set(0, T.MathUtils.lerp(.16, S(.24, .345), rise) + breathe, T.MathUtils.lerp(0, S(-.04, 0), rise))
       body.scale.set(
-        T.MathUtils.lerp(.3, S(.26, .23), rise),
-        T.MathUtils.lerp(.15, S(.18, .12), rise),
-        T.MathUtils.lerp(.23, S(.27, .36), rise),
+        T.MathUtils.lerp(.3, S(.17, .11), rise),
+        T.MathUtils.lerp(.15, S(.15, .08), rise),
+        T.MathUtils.lerp(.23, S(.26, .31), rise),
       )
-      // Chest drops low and forward so the head sits close on top of it; a
-      // smaller scale keeps the torso from looming over the legs.
+      body.rotation.x = T.MathUtils.lerp(0, S(-.22, 0), rise)
+      // Chest: shoulder mass under the neck.
       chest.position.set(
         0,
-        T.MathUtils.lerp(.18, S(.32, .32), rise) + breathe,
-        T.MathUtils.lerp(.05, S(.06, .15), rise),
+        T.MathUtils.lerp(.18, S(.30, .34), rise) + breathe,
+        T.MathUtils.lerp(.05, S(.08, .20), rise),
       )
       chest.scale.set(
         .13,
-        T.MathUtils.lerp(.12, S(.22, .14), rise),
-        T.MathUtils.lerp(.13, S(.13, .13), rise),
+        T.MathUtils.lerp(.12, S(.20, .10), rise),
+        T.MathUtils.lerp(.13, S(.13, .12), rise),
       )
-      // Head: low and forward when sleeping; up and forward in sphinx pose;
-      // low and forward (close to the body) when walking.
+      // Neck bridges torso and head so the head is never a floating ball.
+      neck.position.set(
+        0,
+        T.MathUtils.lerp(.2, S(.40, .44), rise) + breathe,
+        T.MathUtils.lerp(.12, S(.14, .28), rise),
+      )
+      neck.scale.set(
+        T.MathUtils.lerp(.02, S(.085, .09), rise),
+        T.MathUtils.lerp(.02, S(.15, .14), rise),
+        T.MathUtils.lerp(.02, S(.085, .09), rise),
+      )
+      neck.rotation.x = T.MathUtils.lerp(0, S(-.2, -.5), rise)
+      // Head: low and tucked when sleeping, upright in the sphinx sit, high
+      // and forward at the top of the sloping neck when walking.
       head.position.set(
-        T.MathUtils.lerp(.16, S(.13, 0), rise),
-        T.MathUtils.lerp(.19, S(.58, .42), rise) + breathe + walk * Math.sin(gait * Math.PI * 4) * .012,
-        T.MathUtils.lerp(.14, S(.13, .32), rise),
+        T.MathUtils.lerp(.16, S(0, 0), rise),
+        T.MathUtils.lerp(.19, S(.52, .50), rise) + breathe + walk * Math.sin(gait * Math.PI * 4) * .012,
+        T.MathUtils.lerp(.14, S(.18, .34), rise),
       )
       const look = Math.atan2(gaze.x - group.position.x, gaze.z - group.position.z) - group.rotation.y
       const yaw = T.MathUtils.clamp(Math.atan2(Math.sin(look), Math.cos(look)), -.95, .95)
-      // The sitting cat still tracks the cursor (calmly — the yaw target is
-      // undamped so it settles quickly); only the walking gait adds a bob.
-      const walkYaw = yaw + Math.sin(gait * Math.PI * 2) * .07
+      // A walking cat watches where it is going — the head faces the
+      // direction of travel with only a small gait bob. The gaze tracking
+      // (following the cursor) is for the sitting cat.
+      const walkYaw = Math.sin(gait * Math.PI * 2) * .07
       head.rotation.y = T.MathUtils.lerp(head.rotation.y, T.MathUtils.lerp(-.45, state === 'walking' ? walkYaw : yaw, rise), smoothing)
-      // Chin tucked just a touch while walking — not so much that the head
-      // looks disconnected from the neck.
-      head.rotation.z = T.MathUtils.lerp(-.48, state === 'walking' ? -.06 : -.02, rise)
+      head.rotation.z = T.MathUtils.lerp(-.48, state === 'walking' ? -.08 : -.02, rise)
       head.rotation.x = -.04 * rise
       hitBox.scale.set(1 - rise * .28, .38 + rise * .62, 1 - rise * .28); hitBox.position.y = .19 + rise * .32
       awakeEyes.visible = rise > .65; sleepingEyes.visible = !awakeEyes.visible
@@ -145,31 +159,34 @@ export function createCat(obstacles: T.Box2[], onState: (state: CatState) => voi
       legs.forEach((leg, i) => {
         const front = i < 2, side = i % 2 ? 1 : -1
         // Four-beat diagonal walk: front-left and rear-right stride together,
-        // front-right and rear-left a half-step later. Real cats use a true
-        // 4-beat gait, but matching the diagonal pair carries the readable
-        // cycle. The supporting paw slides backward; only the returning paw
-        // lifts, so the feet do not paddle through the floor.
+        // front-right and rear-left a half-step later. The supporting paw
+        // slides backward at the same speed the body travels, so planted
+        // feet do not skate; only the returning paw lifts.
         const phase = (gait + [0, .5, .5, 0][i]) % 1, swing = Math.max(0, (phase - .64) / .36)
-        const step = reduced ? 0 : phase < .64 ? .145 - phase / .64 * .29 : -.145 + .29 * swing * swing * (3 - 2 * swing)
-        const lift = reduced ? 0 : Math.sin(swing * Math.PI) * .06
-        // Walking (rise=1, walk=1): low shoulders so the body sits horizontal
-        // and the legs carry the cat naturally. These are the walk=1 targets
-        // that S(sitX, walkingTarget) lerps the sphinx sit toward.
-        const hipX = front ? .085 + walk * .005 : .14 - walk * .005
-        const hipY = front ? .31 - walk * .03 : .22
-        const hipZ = front ? .14 : -.15
-        const pawX = front ? .085 : .14
-        const pawZ = front ? .18 : -.17
-        // Sitting (rise=1, walk=0): sphinx / Egyptian pose — front legs
-        // straight down from chest to floor in front of body, back legs
-        // folded forward at the knee so the paws come down beside the body.
-        const sitHipX = .085
-        const sitHipY = front ? .28 : .18
-        const sitHipZ = front ? .08 : -.08
-        const sitPawX = front ? .085 : .14
-        const sitPawZ = front ? .11 : -.02
-        const sitUpper = front ? .16 : .09
-        const sitLower = front ? .16 : .11
+        const step = reduced ? 0 : phase < .64 ? .11 - phase / .64 * .22 : -.11 + .22 * swing * swing * (3 - 2 * swing)
+        const lift = reduced ? 0 : Math.sin(swing * Math.PI) * .05
+        // Walking legs: hips and shoulders under the horizontal torso, the
+        // segments summing to the shoulder height so the legs read as long
+        // and straight like the reference silhouette.
+        const hipX = front ? .10 : .08
+        const hipY = .33
+        const hipZ = front ? .22 : -.21
+        const pawX = front ? .10 : .08
+        const pawZ = front ? .22 : -.21
+        // Back legs have a hock joint: upper+lower only reach the hock
+        // (~.09 above the paw), so they must be shorter than the front pair
+        // or the knee over-folds and the rump squats.
+        const walkUpper = front ? .145 : .11
+        const walkLower = front ? .145 : .10
+        // Sphinx sit: front legs straight down beside the chest, back legs
+        // folded forward at the knee, paws resting alongside the body.
+        const sitHipX = front ? .08 : .13
+        const sitHipY = front ? .24 : .15
+        const sitHipZ = front ? .12 : -.07
+        const sitPawX = front ? .08 : .13
+        const sitPawZ = front ? .14 : 0
+        const sitUpper = front ? .10 : .07
+        const sitLower = front ? .10 : .075
         const sitKnee = front ? .04 : .07
         shoulder.set(
           side * T.MathUtils.lerp(.12, S(sitHipX, hipX), rise),
@@ -181,10 +198,6 @@ export function createCat(obstacles: T.Box2[], onState: (state: CatState) => voi
           .043 + lift * walk,
           T.MathUtils.lerp(front ? .15 : -.1, S(sitPawZ, pawZ), rise) + step * walk,
         )
-        // Walking segment lengths at walk=1 — shorter than the old stand-tall
-        // pose so the cat looks compact when it strides.
-        const walkUpper = front ? .17 : .14
-        const walkLower = front ? .18 : .13
         const upper = T.MathUtils.lerp(.09, S(sitUpper, walkUpper), rise)
         const lower = T.MathUtils.lerp(.095, S(sitLower, walkLower), rise)
         const knee = T.MathUtils.lerp(.035, S(sitKnee, .09), rise)
