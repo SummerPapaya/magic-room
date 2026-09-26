@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Summer's Magic Room">
+  <defs>
+    <linearGradient id="night" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#343350"/>
+      <stop offset="1" stop-color="#171e35"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#b9a7cf"/>
+      <stop offset="1" stop-color="#f4cda9"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="29" fill="url(#night)"/>
+  <path d="M22 107V53a42 42 0 0 1 84 0v54Z" fill="#f7e9d4"/>
+  <path d="M32 99V54a32 32 0 0 1 64 0v45Z" fill="url(#sky)"/>
+  <circle cx="64" cy="71" r="18" fill="#ffe6ad"/>
+  <path d="M32 96c14-8 22-4 32-10 13 7 20 1 32 10v3H32Z" fill="#767192"/>
+  <path d="M64 22v77M32 58h64" stroke="#f7e9d4" stroke-width="5" stroke-linecap="round"/>
+  <path d="M43 113 93 64" stroke="#b98d70" stroke-width="7" stroke-linecap="round"/>
+  <path d="M43 113 93 64" stroke="#f6d5a6" stroke-width="3" stroke-linecap="round"/>
+  <path d="m95 43 4 11 11 4-11 4-4 11-4-11-11-4 11-4Z" fill="#fff4c9"/>
+  <circle cx="109" cy="38" r="3" fill="#f4c4cd"/>
+  <circle cx="79" cy="36" r="2" fill="#fff4c9"/>
+</svg>

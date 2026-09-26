@@ -1,0 +1,17 @@
+{
+  "name": "Summer's Magic Room · 大夏的魔法书屋",
+  "short_name": "Magic Room",
+  "start_url": "/daxia-v2.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#242942",
+  "theme_color": "#242942",
+  "icons": [
+    {
+      "src": "/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
