@@ -1,0 +1,15 @@
+name = "magic-room"
+compatibility_date = "2024-09-23"
+
+# Static-assets-only Worker: no script, everything under ./dist is served
+# straight from the edge. `npm run build:cf` emits dist/index.html (renamed
+# from daxia-v2.html) plus hashed assets.
+[assets]
+directory = "./dist"
+
+# Production hostname. The domain must already be on Cloudflare; do NOT set
+# `routes` here — custom domains are attached via the dashboard after the
+# first deploy (Workers & Pages → magic-room → Settings → Custom Domains),
+# same as summertown (routes + custom_domain = true fails with code 100117
+# when the hostname has externally managed DNS records).
+# Target: magic-room.summercommences.com
